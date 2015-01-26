@@ -1,15 +1,15 @@
-#### Function to Import Data for Analysis ####
-# Manuel Schütze - August 2014
+#### MALTOR - Function to Import Data for Analysis ####
+## Manuel Schütze - August 2014 ##
 
 #Libraries required
 require(AnalyzeFMRI)
 
 ### TEMP ###
-mainFolder <- "_age"
-input <- list(
-  x=list(type="image", path="img", mask="gm_mask.nii"),
-  y=list(type="text", path="age.tsv")
-)
+#mainFolder <- "nf1"
+#input <- list(
+#  x=list(type="image", path="gc_img", mask="gm_mask2.nii"),
+#  y=list(type="text", path="dados.tsv")
+#)
 ############
 
 importData <- function(mainFolder,input) {
@@ -23,22 +23,26 @@ importData <- function(mainFolder,input) {
   
   ## Function to read in text ##
   readText <- function(path) {
-    cat("Importing text file... ")
-    path <- paste(getwd(),mainFolder,path,sep="/")
-    if(length(grep("csv",path))>0) { #read text as csv - comma as separator, dot as decimal
-      textData <- read.csv(path, header=T, sep=",", dec=".")
-    } else { #read text as text file (tab/space separated values)
-      textData <- read.table(path, header=T, na.strings=c("\t","-","x","NA"))
+    fullpath <- paste(mainFolder,path,sep="/")
+    cat("Importing text file",fullpath,"\n")
+    if(length(grep("xlsx",fullpath))>0) { #read text as Excel file (xlsx) - only sheet 1 will be read!
+      require("xlsx")
+      textData <- read.xlsx(fullpath, sheetIndex=1, as.data.frame=TRUE, header=TRUE)
+    } else {
+      if(length(grep("csv",fullpath))>0) { #read text as csv - comma as separator, dot as decimal
+        textData <- read.csv(fullpath, header=TRUE, sep=",", dec=".")
+      } else { #read text as text file (tab/space separated values)
+        textData <- read.table(fullpath, header=TRUE, na.strings=c("\t","x","NA"))
+      }
     }
-    #textData <- as.matrix(textData)
-    cat("Read",nrow(textData),"rows and",ncol(textData),"columns.\n")
+    cat("Read",nrow(textData),"rows and",ncol(textData),"columns.\n----------\n")
     returnList <- list(id=textData[,1],data=textData)
     return(returnList)
   }
   
   ## Function to read in images ##
   readImages <- function(path,maskfile) {
-    maskfile <- paste(getwd(),mainFolder,maskfile,sep="/")
+    maskfile <- paste(mainFolder,maskfile,sep="/")
     
     #first read mask into array, apply formating if needed
     if(length(grep("nii",maskfile))>0) { 
@@ -58,15 +62,15 @@ importData <- function(mainFolder,input) {
     maskDim <- dim(maskArray)
     
     #find images in folder
-    imgFolder <- paste(getwd(),mainFolder,path,sep="/") #full path to image folder
+    imgFolder <- paste(mainFolder,path,sep="/") #full path to image folder
     files <- list.files(path=imgFolder,pattern="*.nii")
     N <- length(files) #number of images
 
     #read in images into matrix
     imgData <- matrix(0,N,features) #create DATA matrix and fill it with zeros
-    cat(paste("Importing",N,"images... "))
+    cat("Importing",N,"images from folder",imgFolder,"\n")
     for (i in 1:N) {
-      cat(i,ifelse(i==N,".",","),sep="") #prints current image being processed
+      cat(i,ifelse(i==N,". Done!",","),sep="") #prints current image being processed
       currentFile <- paste(imgFolder,files[i],sep="/")
       currentVolume <- f.read.nifti.volume(currentFile)
       if(all(maskDim!=dim(currentVolume))) { 
@@ -74,7 +78,7 @@ importData <- function(mainFolder,input) {
       }
       imgData[i,] <- currentVolume[maskIndex] #Get masked voxels from current volume
     }
-    cat("\n")
+    cat("\n----------\n")
     returnList <- list(id=files,data=imgData)
     return(returnList)
   }
@@ -94,7 +98,7 @@ importData <- function(mainFolder,input) {
   for(i in 1:length(output)) ids[,i] <- as.character(output[[i]]$id)
   colnames(ids) <- paste("Var",names(input))
   rownames(ids) <- paste(1:nrow(ids),". ",sep="")
-  cat("----------\nThe IDs for the imported variables are:\n")
+  cat("The IDs for the imported variables are:\n")
   print.table(ids)
   cat("----------\n")
   
@@ -105,4 +109,4 @@ importData <- function(mainFolder,input) {
 }
 
 ### TEMP ###
-DATA <- importData(mainFolder,input)
+#DATA <- importData(mainFolder,input)
