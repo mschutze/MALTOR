@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 MALTOR.Rproj
+.DS_Store
+.gitignore
