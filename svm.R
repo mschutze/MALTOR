@@ -22,8 +22,7 @@ source("functions.R")
 ### INPUT (change) ####
 mainFolder <- "data/sample"
 input1 <- list(type="image", path="img", mask="mask.nii")
-input1b <- list(type="table", path="dados.xlsx")
-images <- importData(mainFolder,input1b)
+images <- importData(mainFolder,input1)
 input2 <- list(type="table", path="labels.xlsx")
 labels <- importData(mainFolder,input2)
 description <- "controls_X_patients"
