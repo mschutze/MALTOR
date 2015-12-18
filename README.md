@@ -7,8 +7,12 @@ Machine Learning Toolbox in R (MALTOR) contains a set of scripts and functions t
 
 ### Input
 
-MALTOR can import 3D images in Nifti (.nii) format and text data in TXT, CSV or XML format.
+MALTOR can import 3D images in Nifti (.nii) format and text data in TXT, CSV or XLSX (Microsoft Excel) format.
 
 ### Algorithms
 
-Currently the available algorithms are SVM, GPC, GPR, PMA and KCCA (through various libraries).
+Currently the available algorithms are SVM, GPC and GPR (through various libraries).
+
+### Required libraries
+
+The required libraries are: kernlab, oro.nifti, raster, MASS and xlsx (and their dependencies).
